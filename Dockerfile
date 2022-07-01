@@ -1,14 +1,11 @@
-FROM python:3-slim AS builder
-ADD . /app
+FROM python:3.7
+
+RUN apt-get update && \
+    apt-get install git && \
+    python3 -m pip install --user pipx && \
+    python3 -m pipx ensurepath && \
+    python3 -m pipx install git+https://github.com/Atlendis/brownie@add-via-ir-support-1477
+
 WORKDIR /app
 
-# We are installing a dependency here directly into our app source dir
-RUN pip install --target=/app requests
-
-# A distroless container image with Python and some basics like SSL certificates
-# https://github.com/GoogleContainerTools/distroless
-FROM gcr.io/distroless/python3-debian10
-COPY --from=builder /app /app
-WORKDIR /app
 ENV PYTHONPATH /app
-CMD ["/app/main.py"]
